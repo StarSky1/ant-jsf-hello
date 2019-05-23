@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project default="deploy" basedir=".">
+
+    <property name="project.name" value="hello" />
+    <property name="webapp.name" value="hello"/>
+    <property name="build.dir" value="${basedir}/build"/>
+    <property name="src.dir" value="${basedir}/src/main"/>
+    <property name="src.java.dir" value="${src.dir}/java/com"/>
+    <property name="web.dir" value="${src.dir}/webapp"/>
+    <property name="lib.dir" value="${web.dir}/WEB-INF/lib"/>
+    <property name="dist.dir" value="${basedir}/dist"/>
+    <property name="warfile" value="${dist.dir}/${webapp.name}.war"/>
+    <property environment="env"/>
+    <property name="tomcat.dir" value="${env.CATALINA_HOME}" />
+
+    <path id="classpath">
+        <fileset dir="${tomcat.dir}/lib">
+            <include name="**/*.jar"/>
+        </fileset>
+        <fileset dir="${lib.dir}">
+            <include name="**/*.jar"/>
+        </fileset>
+    </path>
+
+    <target name="clean">
+        <delete dir="${build.dir}"/>
+        <delete dir="${dist.dir}" />
+    </target>
+
+    <target name="prepare" depends="clean" description="Create build directories.">
+        <mkdir dir="${build.dir}/${project.name}"/>
+        <mkdir dir="${build.dir}/${project.name}/WEB-INF" />
+        <mkdir dir="${build.dir}/${project.name}/WEB-INF/classes"/>
+        <mkdir dir="${build.dir}/${project.name}/WEB-INF/lib"/>
+    </target>
+
+    <target name="deploy.copyJars">
+        <copy todir="${build.dir}/${project.name}/WEB-INF/lib">
+            <fileset dir="${lib.dir}">
+                <include name="**/*.jar"/>
+                <include name="**/*.dtd"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="build" depends="prepare,deploy.copyJars" description="Compile Java files and copy static files.">
+        <javac debug="true" includeantruntime="true" srcdir="${src.java.dir}" destdir="${build.dir}/${project.name}/WEB-INF/classes">
+            <include name="**/*.java"/>
+            <compilerarg line="-encoding UTF-8 " />
+            <classpath refid="classpath"/>
+        </javac>
+        <echo message="compile finished!" />
+
+    <copy todir="${build.dir}/${project.name}/WEB-INF">
+        <fileset dir="${web.dir}/WEB-INF">
+            <include name="*.xml" />
+            <include name="*.tld"/>
+        </fileset>
+    </copy>
+
+    <copy todir="${build.dir}/${project.name}/">
+        <fileset dir="${web.dir}">
+            <include name="*.html" />
+            <include name="*.jpg" />
+            <include name="*.gif" />
+            <include name="*.xml" />
+            <include name="*.css" />
+            <include name="*.jsp" />
+        </fileset>
+    </copy>
+
+    <copy todir="${build.dir}/${project.name}/WEB-INF/classes">
+        <fileset dir="${src.java.dir}">
+            <include name="**/*.properties"/>
+            <include name="**/*.xml"/>
+            <exclude name="**/*.java"/>
+        </fileset>
+    </copy>
+        <echo message="copy static resources finished!" />
+    </target>
+
+    <target name="build.war" depends="build">
+        <delete dir="${dist.dir}" />
+        <mkdir dir="${dist.dir}" />
+        <!-- create a war file for distribution -->
+        <jar destfile="${dist.dir}/${webapp.name}.war" basedir="${build.dir}/${project.name}"/>
+        <!--<delete dir="${build.dir}"/>-->
+    </target>
+
+    <target name="deploy" depends="build.war">
+        <copy file="${warfile}" todir="${tomcat.dir}/webapps"/>
+        <!--<delete dir="${dist.dir}" />-->
+    </target>
+</project>
