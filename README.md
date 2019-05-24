@@ -8,4 +8,6 @@
 5. 打开命令行，切换到hello项目根目录，输入ant，开始编译、打包、部署hello项目到tomcat的webapps中
 6. 切换到tomcat的bin目录，输入startup，启动tomcat
 7. 打开浏览器，输入`localhost:8080/hello`，访问hello项目
-
+# 执行效果
+![QQ截图20190524093550.png](https://i.loli.net/2019/05/24/5ce74aa560b6a95360.png)
+![QQ截图20190524093603.png](https://i.loli.net/2019/05/24/5ce74aa560c7b48440.png)
