@@ -25,6 +25,7 @@
     <target name="clean">
         <delete dir="${build.dir}"/>
         <delete dir="${dist.dir}" />
+        <delete dir="${tomcat.dir}/webapps/hello" />
     </target>
 
     <target name="prepare" depends="clean" description="Create build directories.">
